@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="주간 SNS 트렌드 아카이브 — 인스타 릴스, 챌린지, SNS 밈, 인기 바이럴 콘텐츠를 주차별로 모아둔 대시보드">
+<title>주간 SNS 트렌드 아카이브</title>
+<style>
+  /* ===== Design tokens ===== */
+  :root{
+    --bg:#f5f3ef;
+    --surface:#ffffff;
+    --surface-2:#fbfaf8;
+    --ink:#151419;
+    --ink-2:#3d3a45;
+    --muted:#7b7784;
+    --line:#e6e2da;
+    --line-strong:#d6d1c7;
+    --accent:#df3f28;
+    --accent-soft:#fdece8;
+
+    --c-reels:#d22a67;   --c-reels-bg:#fdebf1;
+    --c-meme:#5f45e0;    --c-meme-bg:#eeebff;
+    --c-viral:#0d8a72;   --c-viral-bg:#e4f5f0;
+    --c-etc:#8a6a1f;     --c-etc-bg:#f8f1de;
+
+    --radius:18px;
+    --radius-sm:10px;
+    --shadow:0 1px 2px rgba(21,20,25,.05), 0 10px 26px -16px rgba(21,20,25,.28);
+    --shadow-hover:0 2px 4px rgba(21,20,25,.06), 0 18px 38px -18px rgba(21,20,25,.32);
+    --wrap:1180px;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f0f13;
+      --surface:#181820;
+      --surface-2:#1d1d26;
+      --ink:#f3f2f6;
+      --ink-2:#c3c0cd;
+      --muted:#8f8a9b;
+      --line:#2a2a34;
+      --line-strong:#3a3a47;
+      --accent:#ff6a4d;
+      --accent-soft:#3a1d16;
+
+      --c-reels:#ff7fb1;  --c-reels-bg:#3a1526;
+      --c-meme:#a68bff;   --c-meme-bg:#241c45;
+      --c-viral:#4dd6b6;  --c-viral-bg:#0d3029;
+      --c-etc:#e0bd6a;    --c-etc-bg:#332a16;
+
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -16px rgba(0,0,0,.8);
+      --shadow-hover:0 2px 4px rgba(0,0,0,.45), 0 18px 38px -18px rgba(0,0,0,.9);
+    }
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,"Segoe UI",Roboto,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    letter-spacing:-0.01em;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;cursor:pointer}
+  mark{background:linear-gradient(transparent 55%, rgba(223,63,40,.28) 55%); color:inherit; border-radius:2px; padding:0 1px}
+  @media (prefers-color-scheme: dark){ mark{background:linear-gradient(transparent 55%, rgba(255,106,77,.35) 55%)} }
+
+  .wrap{width:100%; max-width:var(--wrap); margin:0 auto; padding:0 20px}
+  @media (min-width:768px){ .wrap{padding:0 32px} }
+
+  /* ===== Masthead ===== */
+  .masthead{
+    position:relative;
+    padding:30px 0 26px;
+    background:
+      radial-gradient(900px 320px at 12% -30%, rgba(223,63,40,.10), transparent 70%),
+      radial-gradient(760px 300px at 92% -10%, rgba(95,69,224,.10), transparent 72%),
+      var(--bg);
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .masthead-top{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:22px;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+    font-weight:600;
+  }
+  .brand{display:inline-flex; align-items:center; gap:8px; color:var(--ink-2)}
+  .brand-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  .masthead h1{
+    margin:0 0 10px;
+    font-size:clamp(27px,4.6vw,42px);
+    line-height:1.22;
+    letter-spacing:-0.035em;
+    font-weight:800;
+  }
+  .masthead .sub{
+    margin:0;
+    color:var(--muted);
+    font-size:clamp(13px,1.6vw,15px);
+    letter-spacing:-0.005em;
+  }
+
+  /* Stats */
+  .stats{
+    margin-top:26px;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .stat{background:var(--surface); padding:14px 16px; min-width:0}
+  .stat-k{
+    display:block;
+    font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); font-weight:600; margin-bottom:6px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .stat-v{
+    font-size:clamp(19px,3.4vw,26px);
+    font-weight:800;
+    letter-spacing:-0.03em;
+    line-height:1.1;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .stat-v .unit{font-size:.55em; font-weight:700; color:var(--muted); margin-left:2px; letter-spacing:0}
+  @media (max-width:560px){
+    .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .stat:last-child{grid-column:1 / -1; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+    .stat:last-child .stat-k{margin-bottom:0}
+    .stat:last-child .stat-v{letter-spacing:-0.02em}
+  }
+  @media (max-width:420px){
+    .stat{padding:12px 11px}
+    .stat-k{font-size:9.5px; letter-spacing:.06em}
+  }
+
+  /* ===== Controls (sticky) ===== */
+  .controls{
+    position:sticky; top:0; z-index:30;
+    background:var(--bg);
+    background:color-mix(in srgb, var(--bg) 86%, transparent);
+    -webkit-backdrop-filter:saturate(1.6) blur(14px);
+    backdrop-filter:saturate(1.6) blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .controls-inner{padding-top:12px; padding-bottom:12px}
+
+  /* Week tabs */
+  .tabs{
+    display:flex; gap:8px;
+    overflow-x:auto;
+    padding-bottom:2px;
+    margin:0 -2px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{
+    flex:0 0 auto;
+    display:inline-flex; align-items:center; gap:7px;
+    padding:8px 14px;
+    border-radius:999px;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    color:var(--ink-2);
+    font-size:13px; font-weight:600;
+    letter-spacing:-0.015em;
+    white-space:nowrap;
+    transition:background .16s ease, color .16s ease, border-color .16s ease, transform .16s ease;
+  }
+  .tab:hover{border-color:var(--ink-2); transform:translateY(-1px)}
+  .tab[aria-selected="true"]{
+    background:var(--ink); color:var(--bg); border-color:var(--ink);
+  }
+  .tab .tab-count{
+    font-size:10.5px; font-weight:700;
+    padding:1px 6px; border-radius:999px;
+    background:var(--surface-2); color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+  .tab[aria-selected="true"] .tab-count{background:rgba(255,255,255,.16); color:#fff}
+  @media (prefers-color-scheme: dark){
+    .tab[aria-selected="true"]{color:#0f0f13}
+    .tab[aria-selected="true"] .tab-count{background:rgba(15,15,19,.12); color:#0f0f13}
+  }
+  .tab .tab-date{font-weight:500; font-size:11.5px; color:var(--muted); letter-spacing:0}
+  .tab[aria-selected="true"] .tab-date{color:rgba(255,255,255,.66)}
+  @media (prefers-color-scheme: dark){ .tab[aria-selected="true"] .tab-date{color:rgba(15,15,19,.6)} }
+
+  /* Filters row */
+  .filters{
+    margin-top:10px;
+    display:flex; align-items:center; gap:10px;
+    flex-wrap:wrap;
+  }
+  .pills{
+    display:flex; gap:6px; flex:1 1 auto;
+    min-width:0;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .pills::-webkit-scrollbar{display:none}
+  .pill-btn{
+    flex:0 0 auto;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid transparent;
+    background:var(--surface-2);
+    color:var(--muted);
+    font-size:12.5px; font-weight:600;
+    letter-spacing:-0.01em;
+    white-space:nowrap;
+    transition:color .15s ease, background .15s ease, border-color .15s ease;
+  }
+  .pill-btn:hover{color:var(--ink-2); border-color:var(--line-strong)}
+  .pill-btn[aria-pressed="true"]{
+    background:var(--accent-soft);
+    color:var(--accent);
+    border-color:color-mix(in srgb, var(--accent) 32%, transparent);
+  }
+
+  .search{
+    position:relative;
+    flex:1 1 240px;
+    max-width:340px;
+    min-width:180px;
+    display:flex; align-items:center;
+  }
+  .search svg{
+    position:absolute; left:11px; width:15px; height:15px;
+    color:var(--muted); pointer-events:none;
+  }
+  .search input{
+    width:100%;
+    padding:9px 34px 9px 33px;
+    border-radius:999px;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    color:var(--ink);
+    font:inherit; font-size:13px;
+    letter-spacing:-0.01em;
+    outline:none;
+    transition:border-color .16s ease, box-shadow .16s ease;
+    -webkit-appearance:none;
+  }
+  .search input::placeholder{color:var(--muted)}
+  .search input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .search input::-webkit-search-cancel-button{-webkit-appearance:none}
+  .search kbd{
+    position:absolute; right:9px;
+    font-size:10.5px; font-family:inherit;
+    padding:1px 6px; border-radius:5px;
+    border:1px solid var(--line-strong);
+    color:var(--muted);
+    background:var(--surface-2);
+    pointer-events:none;
+  }
+  @media (hover:none){ .search kbd{display:none} }
+  @media (max-width:640px){
+    .search{flex:1 1 100%; max-width:none; order:2}
+    .pills{order:1; flex:1 1 100%}
+  }
+
+  /* ===== Main ===== */
+  main{padding:26px 0 70px}
+
+  .result-line{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:12px; flex-wrap:wrap;
+    margin-bottom:16px;
+    font-size:12.5px; color:var(--muted);
+    letter-spacing:-0.005em;
+  }
+  .result-line strong{color:var(--ink); font-weight:700; font-variant-numeric:tabular-nums}
+  .result-line .week-note{font-size:12px}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));
+    gap:16px;
+    align-items:start;
+  }
+  @media (min-width:768px){ .grid{gap:18px} }
+
+  /* Card */
+  .card{
+    position:relative;
+    display:flex; flex-direction:column;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 20px 16px;
+    box-shadow:var(--shadow);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    animation:rise .42s cubic-bezier(.22,.7,.28,1) both;
+    animation-delay:calc(var(--i,0) * 34ms);
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute; inset:0 0 auto 0; height:3px;
+    background:var(--cat-color,var(--line-strong));
+    opacity:.85;
+  }
+  .card:hover{
+    transform:translateY(-3px);
+    box-shadow:var(--shadow-hover);
+    border-color:var(--line-strong);
+  }
+  .card:focus-within{border-color:var(--accent)}
+  .card[data-cat="reels"]{--cat-color:var(--c-reels)}
+  .card[data-cat="meme"]{--cat-color:var(--c-meme)}
+  .card[data-cat="viral"]{--cat-color:var(--c-viral)}
+  .card[data-cat="etc"]{--cat-color:var(--c-etc)}
+
+  @keyframes rise{
+    from{opacity:0; transform:translateY(10px)}
+    to{opacity:1; transform:translateY(0)}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card{animation:none}
+    .card:hover{transform:none}
+    html{scroll-behavior:auto}
+  }
+
+  .card-head{
+    display:flex; align-items:center; gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .cat-pill{
+    display:inline-flex; align-items:center;
+    padding:3px 9px;
+    border-radius:6px;
+    font-size:11px; font-weight:700;
+    letter-spacing:-0.01em;
+    white-space:nowrap;
+  }
+  .cat-pill[data-cat="reels"]{background:var(--c-reels-bg); color:var(--c-reels)}
+  .cat-pill[data-cat="meme"]{background:var(--c-meme-bg); color:var(--c-meme)}
+  .cat-pill[data-cat="viral"]{background:var(--c-viral-bg); color:var(--c-viral)}
+  .cat-pill[data-cat="etc"]{background:var(--c-etc-bg); color:var(--c-etc)}
+
+  .metric{
+    margin-left:auto;
+    text-align:right;
+    font-size:11.5px; font-weight:700;
+    color:var(--ink-2);
+    letter-spacing:-0.01em;
+    font-variant-numeric:tabular-nums;
+    padding:3px 8px;
+    border-radius:6px;
+    border:1px dashed var(--line-strong);
+    white-space:nowrap;
+  }
+
+  .card h3{
+    margin:0 0 9px;
+    font-size:16.5px;
+    line-height:1.42;
+    font-weight:750;
+    letter-spacing:-0.028em;
+    word-break:keep-all;
+    overflow-wrap:anywhere;
+  }
+  .card h3 a{
+    background-image:linear-gradient(var(--cat-color,var(--accent)),var(--cat-color,var(--accent)));
+    background-size:0% 2px;
+    background-repeat:no-repeat;
+    background-position:0 100%;
+    transition:background-size .25s ease;
+  }
+  .card h3 a:hover{background-size:100% 2px}
+  .card h3 a:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px}
+
+  .card-desc{
+    margin:0 0 16px;
+    font-size:13.5px;
+    line-height:1.72;
+    color:var(--ink-2);
+    letter-spacing:-0.012em;
+    word-break:keep-all;
+    overflow-wrap:anywhere;
+  }
+
+  .card-foot{
+    margin-top:auto;
+    padding-top:13px;
+    border-top:1px solid var(--line);
+    display:flex; align-items:center; gap:10px;
+    flex-wrap:wrap;
+    font-size:12.5px;
+  }
+  .go{
+    display:inline-flex; align-items:center; gap:4px;
+    padding:6px 12px;
+    border-radius:8px;
+    background:var(--ink);
+    color:var(--bg);
+    font-weight:700; font-size:12px;
+    letter-spacing:-0.01em;
+    transition:opacity .15s ease, transform .15s ease;
+    white-space:nowrap;
+  }
+  .go:hover{opacity:.85; transform:translateX(1px)}
+  .go .arw{font-size:11px; opacity:.75}
+  .alt{
+    display:inline-flex; align-items:center; gap:3px;
+    color:var(--muted);
+    font-size:12px;
+    border-bottom:1px solid transparent;
+    padding-bottom:1px;
+    letter-spacing:-0.01em;
+    transition:color .15s ease, border-color .15s ease;
+    max-width:100%;
+  }
+  .alt:hover{color:var(--ink-2); border-color:var(--line-strong)}
+  .src-label{
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:-0.01em;
+  }
+  .week-chip{
+    margin-left:auto;
+    font-size:10.5px;
+    color:var(--muted);
+    letter-spacing:-0.005em;
+    padding:2px 7px;
+    border-radius:5px;
+    background:var(--surface-2);
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* Empty state */
+  .empty{
+    grid-column:1 / -1;
+    text-align:center;
+    padding:64px 20px;
+    border:1px dashed var(--line-strong);
+    border-radius:var(--radius);
+    background:var(--surface-2);
+  }
+  .empty .em{font-size:26px; display:block; margin-bottom:12px; opacity:.9}
+  .empty p{margin:0 0 16px; color:var(--ink-2); font-size:14px; letter-spacing:-0.01em}
+  .empty button{
+    padding:8px 16px;
+    border-radius:999px;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    font-size:13px; font-weight:600;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .empty button:hover{border-color:var(--ink-2); color:var(--ink)}
+
+  /* Footer */
+  .foot{
+    border-top:1px solid var(--line);
+    padding:24px 0 44px;
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.8;
+    letter-spacing:-0.005em;
+  }
+  .foot strong{color:var(--ink-2); font-weight:600}
+  .foot code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11px;
+    padding:1px 5px;
+    border-radius:4px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--ink-2);
+  }
+
+  @media print{
+    .controls{position:static; backdrop-filter:none}
+    .card{break-inside:avoid; box-shadow:none}
+    .search,.pills{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="masthead-top">
+      <span class="brand"><span class="brand-dot" aria-hidden="true"></span> Weekly SNS Trend Archive</span>
+      <span>매주 일요일 업데이트</span>
+    </div>
+    <h1>🔥 주간 SNS 트렌드 아카이브</h1>
+    <p class="sub">인스타 릴스 · 챌린지 · SNS 밈 · 인기 바이럴 콘텐츠</p>
+    <div class="stats" id="stats" aria-label="아카이브 요약"></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap controls-inner">
+    <div class="tabs" id="weekTabs" role="tablist" aria-label="주차 선택"></div>
+    <div class="filters">
+      <div class="pills" id="catPills" role="group" aria-label="카테고리 필터"></div>
+      <label class="search" for="searchInput">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.6-3.6"></path>
+        </svg>
+        <input id="searchInput" type="search" placeholder="제목 · 설명 · 태그 검색" aria-label="트렌드 검색" autocomplete="off" spellcheck="false">
+        <kbd aria-hidden="true">/</kbd>
+      </label>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="result-line" id="resultLine"></div>
+  <section class="grid" id="grid" aria-live="polite" aria-label="트렌드 카드"></section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <strong>새 주차 추가하는 법</strong> — 이 파일의 <code>&lt;script id="archive-data"&gt;</code> 안 <code>weeks</code> 배열 맨 앞에
+    <code>{ "id", "label", "date", "items": [...] }</code> 형태의 주차 객체를 넣으면, 탭·통계·카드가 자동으로 갱신됩니다. HTML·CSS·JS는 손대지 않아도 됩니다.
+  </div>
+</footer>
+
+<!-- ============================================================================
+     ARCHIVE DATA
+     ----------------------------------------------------------------------------
+     새 주차는 아래 "weeks" 배열의 맨 앞에 객체 하나만 추가하세요.
+
+     {
+       "id":    "2026-11-w4",                 // 고유 id
+       "label": "2026년 11월 4주",            // 탭에 보일 이름
+       "date":  "2026-11-24",                 // 업데이트 날짜 (정렬·최근 업데이트 표시에 사용)
+       "items": [
+         {
+           "category": "릴스·챌린지",          // 릴스·챌린지 | 밈·유행어 | 인기 바이럴 (새 값도 자동 인식)
+           "title":    "제목",
+           "tag":      "지표/하이라이트 태그",
+           "description": "유래와 확산 포인트 2~3문장.",
+           "links": [
+             { "label": "공식 영상", "url": "https://…", "primary": true },   // 첫 링크가 대표 링크
+             { "label": "추가 자료", "url": "https://…" }                     // 선택
+           ]
+         }
+       ]
+     }
+     ============================================================================ -->
+<script id="archive-data" type="application/json">
+{
+  "meta": {
+    "title": "주간 SNS 트렌드 아카이브",
+    "lastUpdated": "2026-11-17"
+  },
+  "weeks": [
+    {
+      "id": "2026-11-w3",
+      "label": "2026년 11월 2~3주",
+      "date": "2026-11-17",
+      "items": [
+        {
+          "category": "릴스·챌린지",
+          "title": "💃 아일릿 '체포하겠어' 소원 챌린지",
+          "tag": "틱톡 800만+",
+          "description": "손가락 총·윙크 안무에서 시작해 가사를 '승진하겠어', '취뽀하겠어', '수능 만점 받겠어'로 바꿔 부르는 말장난 챌린지로 번졌어요. 김지원·아이유까지 참여하며 틱톡 800만+ 조회, 릴스 오디오 상위권을 기록 중이에요.",
+          "links": [
+            { "label": "공식 쇼츠 보기", "url": "https://www.youtube.com/shorts/5MT4r7PTwWU", "primary": true }
+          ]
+        },
+        {
+          "category": "릴스·챌린지",
+          "title": "🏆 에이티즈 '배드' 역주행 & MMA 2026 수상 릴스",
+          "tag": "MMA 2026 화제",
+          "description": "에이티즈 '배드'가 시상식과 예능(지수·몬스타엑스 민혁)을 타고 다시 챌린지로 돌고 있고, 지난 주말 MMA 2026 직후 위시·아이브·아일릿 등 아이돌들의 트로피 인증 릴스 대회가 X·인스타를 점령했어요.",
+          "links": [
+            { "label": "MMA 무대 보기", "url": "https://www.youtube.com/watch?v=BrFOiHPH7mg", "primary": true },
+            { "label": "아이돌 수상 릴스 모음", "url": "https://hweek.kr/article/8858" }
+          ]
+        },
+        {
+          "category": "릴스·챌린지",
+          "title": "🎲 랜덤 필터 '애인 소개하기' 챌린지",
+          "tag": "1,000만+ 조회",
+          "description": "필터가 무작위로 뽑아준 성별·나이·키(\"키 294cm, 50살 연상\")를 진지하게 내 애인이라고 소개하는 릴스 포맷으로, 친구들과 결과 비교하며 찍는 영상이 수백만~1,000만+ 조회를 기록 중이에요.",
+          "links": [
+            { "label": "트렌드 자세히 보기", "url": "https://www.tpick.co.kr/post/15198", "primary": true }
+          ]
+        },
+        {
+          "category": "밈·유행어",
+          "title": "🗣️ 지수 '라우럴(Louder)'",
+          "tag": "넷플릭스·MMA 확산",
+          "description": "11월 8일 인기가요 무대 직전 지수가 함성을 유도하며 외친 \"Louder\"가 '라우럴'로 들려 밈이 됐어요. 지수 본인과 넷플릭스(\"라을라 가고 라우럴 왔다\"), MMA 최예나까지 받아쓰며 수백만 조회를 넘겼어요.",
+          "links": [
+            { "label": "SBS 원본 영상", "url": "https://www.youtube.com/watch?v=CarHqBLFWhg", "primary": true },
+            { "label": "밈 분석 보기", "url": "https://trendzip.co.kr/articles/20261116679654" }
+          ]
+        },
+        {
+          "category": "밈·유행어",
+          "title": "🥔 전여친 감자칼 & AI 티 내는 법",
+          "tag": "스레드·인스타 밈",
+          "description": "헤어진 연인이 다른 건 다 두고 천 원대 양면 감자칼만 돌려달라 했다는 스레드 사연이 '제2의 전남친 토스트'처럼 구매 인증 밈으로 번졌어요. 인스타에선 'AI 티 내는 법'(바이브코딩 특유 그라데이션·이모지 풍자)도 18만+ 조회를 기록했어요.",
+          "links": [
+            { "label": "주간 밈 정리 보기", "url": "https://yongdev.dev/post/2026%EB%85%84-11%EC%9B%94-%EB%91%98%EC%A7%B8-%EC%A3%BC-sns-%ED%8A%B8%EB%A0%8C%EB%93%9C%EB%B0%88-top-10", "primary": true }
+          ]
+        },
+        {
+          "category": "밈·유행어",
+          "title": "🖱️ 딸깍",
+          "tag": "언급량 33만+",
+          "description": "마우스 클릭 소리에서 나와 \"보고서 초안은 AI로 딸깍\"처럼 손쉽게 끝내는 AI 시대 대표 유행어로 자리 잡았어요. 올해 SNS 언급량 33만 건+를 넘긴 스테디 밈이에요.",
+          "links": [
+            { "label": "주간 밈 정리 보기", "url": "https://yongdev.dev/post/2026%EB%85%84-11%EC%9B%94-%EB%91%98%EC%A7%B8-%EC%A3%BC-sns-%ED%8A%B8%EB%A0%8C%EB%93%9C%EB%B0%88-top-10", "primary": true }
+          ]
+        },
+        {
+          "category": "인기 바이럴",
+          "title": "🍡 광주 초코 꿀떡 · 서촌 주댕치 나무 · 목탁 스트레스볼",
+          "tag": "조회 200만+ · 핫플",
+          "description": "떡지순례 열풍 속 광주 '초코 꿀떡' 릴스가 200만+ 조회를 넘겼고, 서촌 얀바밍 전시의 다마고치 '주댕치' 나무는 인증샷 줄 서는 핫플이 됐어요. 1020 불교 굿즈 열풍을 탄 세븐일레븐 '목탁 스트레스볼'과 연희동 '사과 도넛'도 화제예요.",
+          "links": [
+            { "label": "캐릿 마이크로 트렌드", "url": "https://www.careet.net/MicroTrend", "primary": true }
+          ]
+        },
+        {
+          "category": "인기 바이럴",
+          "title": "💄 올리브영 블프 뷰티 릴스 공식",
+          "tag": "평소 대비 8배+",
+          "description": "11월 올영 블프 상위 릴스 분석 기준, 단순 제품 시연보다 '전직 승무원이 다시 해본 화잘먹 앰플'처럼 상황·인물 설정으로 첫 3초를 잡는 포맷이 평소 대비 8배+ 조회로 압도적 1위였어요.",
+          "links": [
+            { "label": "릴스 분석 리포트", "url": "https://www.hypenow.io/contents/2026-11-01_2026-11-06-oliveyoung-ads/analysis-report", "primary": true }
+          ]
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- constants ---------- */
+  var BASE_CATEGORIES = ["릴스·챌린지", "밈·유행어", "인기 바이럴"];
+  var EXTRA_ORDER = 900;
+
+  /* ---------- state ---------- */
+  var state = { week: "all", category: "all", query: "" };
+
+  /* ---------- read embedded archive ---------- */
+  var data = { meta: {}, weeks: [] };
+  var dataEl = document.getElementById("archive-data");
+  if (dataEl) {
+    try {
+      var parsed = JSON.parse(dataEl.textContent);
+      if (parsed && typeof parsed === "object") {
+        data.meta = parsed.meta || {};
+        data.weeks = Array.isArray(parsed.weeks) ? parsed.weeks : [];
+      }
+    } catch (err) {
+      console.error("[archive] JSON 파싱 실패:", err);
+    }
+  }
+
+  /* ---------- normalize ---------- */
+  function mmdd(date) {
+    var s = String(date || "");
+    return s.length >= 10 ? s.slice(5, 7) + "." + s.slice(8, 10) : "";
+  }
+
+  var weeks = data.weeks
+    .filter(function (w) { return w && typeof w === "object"; })
+    .slice()
+    .sort(function (a, b) { return String(b.date || "").localeCompare(String(a.date || "")); })
+    .map(function (w, wi) {
+      var items = (Array.isArray(w.items) ? w.items : []).filter(function (it) {
+        return it && typeof it === "object" && it.title;
+      });
+      return {
+        id: String(w.id || ("week-" + (wi + 1))),
+        label: String(w.label || ("Week " + (wi + 1))),
+        short: String(w.label || "").replace(/^\d{4}\s*년\s*/, "").trim(),
+        date: String(w.date || ""),
+        weekNo: mmdd(w.date),
+        items: items
+      };
+    });
+
+  /* flatten with week back-reference, keeping newest week first */
+  var allItems = [];
+  weeks.forEach(function (w) {
+    w.items.forEach(function (it) {
+      allItems.push({
+        category: String(it.category || "기타"),
+        title: String(it.title || ""),
+        tag: it.tag ? String(it.tag) : "",
+        description: it.description ? String(it.description) : "",
+        links: (Array.isArray(it.links) ? it.links : []).filter(function (l) {
+          return l && l.url;
+        }),
+        keywords: Array.isArray(it.keywords) ? it.keywords.map(String) : [],
+        week: w
+      });
+    });
+  });
+
+  /* ---------- category helpers ---------- */
+  function slugOf(cat) {
+    if (cat === "릴스·챌린지") return "reels";
+    if (cat === "밈·유행어") return "meme";
+    if (cat === "인기 바이럴") return "viral";
+    return "etc";
+  }
+
+  var categoryList = (function () {
+    var found = {};
+    allItems.forEach(function (it) { found[it.category] = true; });
+    var known = BASE_CATEGORIES.filter(function (c) { return found[c]; });
+    var extras = Object.keys(found).filter(function (c) { return BASE_CATEGORIES.indexOf(c) === -1; }).sort();
+    if (known.length + extras.length === 0) return BASE_CATEGORIES.slice();
+    return known.concat(extras);
+  })();
+
+  /* ---------- tiny DOM helpers ---------- */
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        if (k === "className") node.className = attrs[k];
+        else if (k === "text") node.textContent = attrs[k];
+        else if (k === "dataset") Object.keys(attrs[k]).forEach(function (d) { node.setAttribute("data-" + d, attrs[k][d]); });
+        else if (attrs[k] !== null && attrs[k] !== undefined) node.setAttribute(k, attrs[k]);
+      });
+    }
+    if (children) {
+      (Array.isArray(children) ? children : [children]).forEach(function (c) {
+        if (c === null || c === undefined) return;
+        node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+      });
+    }
+    return node;
+  }
+
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+  /* text with <mark> around the query matches */
+  function highlighted(text, query) {
+    if (!query) return document.createTextNode(text);
+    var frag = document.createDocumentFragment();
+    var lower = text.toLowerCase();
+    var q = query.toLowerCase();
+    var i = 0;
+    while (i < text.length) {
+      var idx = lower.indexOf(q, i);
+      if (idx === -1) {
+        frag.appendChild(document.createTextNode(text.slice(i)));
+        break;
+      }
+      if (idx > i) frag.appendChild(document.createTextNode(text.slice(i, idx)));
+      var mark = document.createElement("mark");
+      mark.textContent = text.slice(idx, idx + q.length);
+      frag.appendChild(mark);
+      i = idx + q.length;
+    }
+    if (text.length === 0) frag.appendChild(document.createTextNode(""));
+    return frag;
+  }
+
+  /* ---------- stats ---------- */
+  function renderStats() {
+    var box = document.getElementById("stats");
+    if (!box) return;
+    clear(box);
+
+    var latest = data.meta.lastUpdated || "";
+    weeks.forEach(function (w) {
+      if (w.date && w.date > latest) latest = w.date;
+    });
+
+    var stats = [
+      { k: "총 아카이빙 주차", v: String(weeks.length), u: "주" },
+      { k: "총 트렌드 수", v: String(allItems.length), u: "개" },
+      { k: "최근 업데이트", v: latest || "-", u: "" }
+    ];
+
+    stats.forEach(function (s) {
+      var v = el("span", { className: "stat-v", text: s.v });
+      if (s.u) v.appendChild(el("span", { className: "unit", text: s.u }));
+      box.appendChild(el("div", { className: "stat" }, [
+        el("span", { className: "stat-k", text: s.k }),
+        v
+      ]));
+    });
+  }
+
+  /* ---------- week tabs ---------- */
+  function renderTabs() {
+    var wrap = document.getElementById("weekTabs");
+    if (!wrap) return;
+    clear(wrap);
+
+    // "전체 보기"
+    var allBtn = el("button", {
+      className: "tab",
+      type: "button",
+      role: "tab",
+      "aria-selected": state.week === "all" ? "true" : "false",
+      dataset: { week: "all" }
+    }, ["전체 보기", el("span", { className: "tab-count", text: String(allItems.length) })]);
+    wrap.appendChild(allBtn);
+
+    weeks.forEach(function (w) {
+      var dateTag = w.weekNo ? el("span", { className: "tab-date", text: "(" + w.weekNo + ")" }) : null;
+      var label = el("span", { text: w.label });
+      var kids = [label];
+      if (dateTag) kids.push(" ", dateTag);
+      kids.push(el("span", { className: "tab-count", text: String(w.items.length) }));
+      var btn = el("button", {
+        className: "tab",
+        type: "button",
+        role: "tab",
+        "aria-selected": state.week === w.id ? "true" : "false",
+        dataset: { week: w.id }
+      }, kids);
+      wrap.appendChild(btn);
+    });
+  }
+
+  /* ---------- category pills ---------- */
+  function renderPills() {
+    var wrap = document.getElementById("catPills");
+    if (!wrap) return;
+    clear(wrap);
+
+    var cats = ["all"].concat(categoryList);
+    cats.forEach(function (c) {
+      var isAll = c === "all";
+      var btn = el("button", {
+        className: "pill-btn",
+        type: "button",
+        "aria-pressed": state.category === c ? "true" : "false",
+        dataset: { category: c }
+      }, isAll ? "전체" : c);
+      wrap.appendChild(btn);
+    });
+  }
+
+  /* ---------- filtering ---------- */
+  function matchesQuery(item, q) {
+    if (!q) return true;
+    var hay = [item.title, item.description, item.tag, item.category]
+      .concat(item.keywords)
+      .join(" ")
+      .toLowerCase();
+    return hay.indexOf(q) !== -1;
+  }
+
+  function visibleItems() {
+    var q = state.query.trim().toLowerCase();
+    return allItems.filter(function (it) {
+      if (state.week !== "all" && it.week.id !== state.week) return false;
+      if (state.category !== "all" && it.category !== state.category) return false;
+      return matchesQuery(it, q);
+    });
+  }
+
+  /* ---------- card ---------- */
+  function buildCard(item, index) {
+    var q = state.query.trim();
+    var primary = null;
+    var others = [];
+    item.links.forEach(function (l) {
+      if (!primary && (l.primary === true || item.links.indexOf(l) === 0)) primary = l;
+      else others.push(l);
+    });
+    // if primary came from index 0 but a later link is flagged primary, prefer the flagged one
+    var flagged = item.links.filter(function (l) { return l.primary === true; })[0];
+    if (flagged && primary !== flagged) {
+      others = item.links.filter(function (l) { return l !== flagged; });
+      primary = flagged;
+    }
+    var primaryUrl = primary ? primary.url : "";
+    var primaryLabel = primary && primary.label ? primary.label : item.title;
+
+    var head = el("div", { className: "card-head" }, [
+      el("span", {
+        className: "cat-pill",
+        dataset: { cat: slugOf(item.category) },
+        text: item.category
+      }),
+      item.tag ? el("span", { className: "metric", text: item.tag }) : null
+    ]);
+
+    var titleLink = el("a", {
+      href: primaryUrl,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      title: primaryLabel
+    });
+    titleLink.appendChild(highlighted(item.title, q));
+
+    var desc = el("p", { className: "card-desc" });
+    desc.appendChild(highlighted(item.description, q));
+
+    var foot = el("div", { className: "card-foot" });
+
+    if (primary) {
+      var go = el("a", {
+        className: "go",
+        href: primary.url,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        "aria-label": primaryLabel + " — " + item.title
+      }, ["바로가기", el("span", { className: "arw", "aria-hidden": "true", text: "↗" })]);
+      foot.appendChild(go);
+    }
+
+    others.forEach(function (l) {
+      foot.appendChild(el("a", {
+        className: "alt",
+        href: l.url,
+        target: "_blank",
+        rel: "noopener noreferrer"
+      }, [String(l.label || "추가 자료"), el("span", { "aria-hidden": "true", text: "↗" })]));
+    });
+
+    if (primary && primary.label && others.length === 0) {
+      foot.appendChild(el("span", { className: "src-label", text: primary.label }));
+    }
+
+    if (state.week === "all" && weeks.length > 1) {
+      foot.appendChild(el("span", { className: "week-chip", text: item.week.short || item.week.label }));
+    }
+
+    return el("article", {
+      className: "card",
+      dataset: { cat: slugOf(item.category) },
+      style: "--i:" + Math.min(index, 12)
+    }, [
+      head,
+      el("h3", null, [titleLink]),
+      desc,
+      foot
+    ]);
+  }
+
+  /* ---------- render grid ---------- */
+  function render() {
+    var grid = document.getElementById("grid");
+    var line = document.getElementById("resultLine");
+    if (!grid) return;
+
+    var items = visibleItems();
+    clear(grid);
+
+    if (line) {
+      clear(line);
+      var left = el("span", null);
+      left.appendChild(el("strong", { text: String(items.length) }));
+      left.appendChild(document.createTextNode("개의 트렌드"));
+      if (state.query.trim()) {
+        left.appendChild(document.createTextNode(" · “" + state.query.trim() + "” 검색 결과"));
+      } else if (state.category !== "all") {
+        left.appendChild(document.createTextNode(" · " + state.category));
+      }
+      line.appendChild(left);
+      line.appendChild(el("span", {
+        className: "week-note",
+        text: state.week === "all"
+          ? "주차별 전체 아카이브"
+          : (weeks.filter(function (w) { return w.id === state.week; })[0] || {}).label || ""
+      }));
+    }
+
+    if (!items.length) {
+      var empty = el("div", { className: "empty" }, [
+        el("span", { className: "em", "aria-hidden": "true", text: "🔍" }),
+        el("p", { text: "조건에 맞는 트렌드가 없어요. 검색어나 필터를 바꿔보세요." })
+      ]);
+      var reset = el("button", { type: "button", text: "필터 초기화" });
+      reset.addEventListener("click", function () { resetFilters(); });
+      empty.appendChild(reset);
+      grid.appendChild(empty);
+      return;
+    }
+
+    var frag = document.createDocumentFragment();
+    items.forEach(function (it, i) { frag.appendChild(buildCard(it, i)); });
+    grid.appendChild(frag);
+  }
+
+  /* ---------- interactions ---------- */
+  function resetFilters() {
+    state.week = "all";
+    state.category = "all";
+    state.query = "";
+    var input = document.getElementById("searchInput");
+    if (input) input.value = "";
+    renderTabs();
+    renderPills();
+    render();
+  }
+
+  function bind() {
+    var tabs = document.getElementById("weekTabs");
+    if (tabs) {
+      tabs.addEventListener("click", function (e) {
+        var btn = e.target.closest ? e.target.closest(".tab") : null;
+        if (!btn) return;
+        var id = btn.getAttribute("data-week");
+        if (!id || id === state.week) return;
+        state.week = id;
+        Array.prototype.forEach.call(tabs.querySelectorAll(".tab"), function (t) {
+          t.setAttribute("aria-selected", t.getAttribute("data-week") === id ? "true" : "false");
+        });
+        render();
+      });
+    }
+
+    var pills = document.getElementById("catPills");
+    if (pills) {
+      pills.addEventListener("click", function (e) {
+        var btn = e.target.closest ? e.target.closest(".pill-btn") : null;
+        if (!btn) return;
+        var cat = btn.getAttribute("data-category");
+        if (!cat) return;
+        state.category = cat;
+        Array.prototype.forEach.call(pills.querySelectorAll(".pill-btn"), function (p) {
+          p.setAttribute("aria-pressed", p.getAttribute("data-category") === cat ? "true" : "false");
+        });
+        render();
+      });
+    }
+
+    var input = document.getElementById("searchInput");
+    if (input) {
+      input.addEventListener("input", function () {
+        state.query = input.value || "";
+        render();
+      });
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          input.value = "";
+          state.query = "";
+          render();
+          input.blur();
+        }
+      });
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      var t = e.target;
+      var tag = t && t.tagName ? t.tagName.toLowerCase() : "";
+      if (tag === "input" || tag === "textarea" || (t && t.isContentEditable)) return;
+      if (!input) return;
+      e.preventDefault();
+      input.focus();
+      input.select();
+    });
+  }
+
+  /* ---------- init ---------- */
+  renderStats();
+  renderTabs();
+  renderPills();
+  bind();
+  render();
+})();
+</script>
+</body>
+</html>
